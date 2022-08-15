@@ -11,7 +11,7 @@ This critical because for a models predictions to be trusted they must be unders
     - [Tabular Data Model Explainers](#tabular-data-model-explainers)
     - [Time Series model Explainers](#time-series-model-explainers)
     - [Clustering Model Explainers](#clustering-model-explainers)
-2. [Explainers By Model Type2](#explainers-by-model-type2)
+2. [Generalized and Personalized Explainers](#generalized-and-personalized-explainers)
     - [Generalized Explainers](#generalized-explainers)
     - [Personalized Explainers](#personalized-explainers)
 
@@ -60,3 +60,36 @@ The following Explainers work with unsupervised clustering ML models, that is to
 | Label-Free XAI | [van der Schaar Lab](https://www.vanderschaar-lab.com/)  | [Label-Free XAI Source Code](https://github.com/vanderschaarlab/Simplex) | [Label-Free XAI Paper](https://arxiv.org/abs/2203.01928) |
 
 
+# Generalized and Personalized Explainers
+
+*This area is a stub and requires improvement.*
+
+Increased interpretability of a model can be achieved in multiple ways. Generalized methods
+may provide an explanation for a models predictions in terms of the features that were important
+for that decision, e.g. a predicted value y<sub>i</sub> was given because feature 1 was high and
+feature 3 was low for the ith prediction record. Whereas, personalized methods may provide their
+explanation by showing examples that were important to the prediction record, e.g. a predicted value
+y<sub>i</sub> was given because the model had previously seen three records with a similar profile
+they all had the same label as the predicted value here.
+
+SimplEx is worthy of note in this section as it bridges the gap between these to categories by
+providing example importances and the features that are important for those examples. It therefore
+appears in both sections below.
+
+## Generalized Explainers
+
+The following explainers provide feature importances for a given prediction.  
+
+| Explainer | Affiliation | GitHub | Paper |
+| ----------- | ----------- | ----------- | ----------- |
+| Dynamask | [van der Schaar Lab](https://www.vanderschaar-lab.com/) | [Dynamask Source Code](https://github.com/JonathanCrabbe/Dynamask) | [Dynamask Paper](https://arxiv.org/abs/2106.05303) |
+| SimplEx | [van der Schaar Lab](https://www.vanderschaar-lab.com/)  | [SimplEx Source Code](https://github.com/JonathanCrabbe/Label-Free-XAI) | [SimplEx Paper](https://papers.nips.cc/paper/2021/hash/65658fde58ab3c2b6e5132a39fae7cb9-Abstract.html) |
+
+
+## Personalized Explainers
+
+The following explainers provide example importances for a given prediction.  
+
+| Explainer | Affiliation | GitHub | Paper |
+| ----------- | ----------- | ----------- | ----------- |
+| SimplEx | [van der Schaar Lab](https://www.vanderschaar-lab.com/)  | [SimplEx Source Code](https://github.com/JonathanCrabbe/Label-Free-XAI) | [SimplEx Paper](https://papers.nips.cc/paper/2021/hash/65658fde58ab3c2b6e5132a39fae7cb9-Abstract.html) |
