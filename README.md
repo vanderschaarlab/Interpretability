@@ -3,10 +3,8 @@
 This repository collects different Machine Learning interpretability methods and aims to act
 as a reference where the user can select the method best suited for their needs. All the methods
 aim to provide an insight into why a machine learning model has made a given prediction.
-This is critical because for a models predictions to be trusted they must be understood. 
-All the linked van der Schaar Lab repositories on this page are pytorch compatible. pytorch versions
-of the other methods are available on public libraries, such as [captum](https://captum.ai/).
-<TODO inputs and output.>
+This is critical because for a model's predictions to be trusted they must be understood.
+
 
 # Table of Contents
 0. [Background](#background)
@@ -26,11 +24,12 @@ The Machine Learning (ML) community has produced incredible models for making hi
 accurate predictions and classifications across many fields. However, uptake of these models into
 settings outside of the ML community faces a key barrier: Interpretability. If a human cannot
 understand why a decision has been made by a machine, they cannot be reasonably expected to act
-on that decision with full confidence, particularly in a high-stakes environment such as mdeicine.
+on that decision with full confidence, particularly in a high-stakes environment such as medicine.
 Therefore making the decisions of "Black-Box" models more transparent is of vital importance.
 
 This GitHub repository aims to act as a home for interpretability methods, where the state-of-the-art models
-can be found for every application. 
+can be found for every application. All the linked van der Schaar Lab repositories on this page are pytorch compatible.
+Pytorch versions of the other methods are available on public libraries, such as [captum](https://captum.ai/).
 
 # Explainers
 
@@ -68,7 +67,7 @@ There are many different static tabular data explainers, giving many different o
 | Explainer | Inputs | Notes | 
 | ----------- | ----------- | ----------- | 
 | SimplEx | The latent representation of records from the predictive model. | It is worth noting that SimplEx appears in both this and the following section as it can be easily implemented for either tabular data or time series data. |
-| Symbolic Pursuit | The training data and corresponding model predictions. | This method has the benefit of producing a mathematical expression that approximates the predictive model. <TODO how is this useful> |
+| Symbolic Pursuit | The training data and corresponding model predictions. | This method has the benefit of producing a mathematical expression that approximates the predictive model. This seeks to discover “rules” and “laws” learned by the machine model. |
 | INVASE | The training data and corresponding model predictions, with which to train a selector network. | Currently, INVASE has only been implemented for tabular data, but it could be extended to include time series explanations with some further work, see Section 5 of the paper linked above, "Future Work". |
 | SHAP | The predictive model and training data from which to subsequently calculate Shapley values. ||
 | Integrated gradients | The predictive model and its gradients. ||
