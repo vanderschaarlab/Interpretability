@@ -25,7 +25,8 @@ accurate predictions and classifications across many fields. However, uptake of 
 settings outside of the ML community faces a key barrier: Interpretability. If a human cannot
 understand why a decision has been made by a machine, they cannot be reasonably expected to act
 on that decision with full confidence, particularly in a high-stakes environment such as medicine.
-Therefore making the decisions of "Black-Box" models more transparent is of vital importance.
+Therefore making the decisions of "Black-Box" models more transparent is of vital importance. For more
+information see this [blog post](https://www.vanderschaar-lab.com/interpretable-machine-learning/). 
 
 This GitHub repository aims to act as a home for interpretability methods, where the state-of-the-art models
 can be found for every application. All the linked van der Schaar Lab repositories on this page are pytorch compatible.
