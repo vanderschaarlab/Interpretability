@@ -39,10 +39,12 @@ Below are all the explainers included in this repository, with links to their so
 
 | Explainer | Affiliation | GitHub | Paper | Date of Paper |
 | ----------- | ----------- | ----------- | ----------- | ----------- |
-| Label-Free XAI | [van der Schaar Lab](https://www.vanderschaar-lab.com/) | [Label-Free XAI Source Code](https://github.com/JonathanCrabbe/Label-Free-XAI) | [Label-Free XAI Paper](https://arxiv.org/abs/2203.01928) | 2022|
+| Concept Activation Regions (CARs) | [van der Schaar Lab](https://www.vanderschaar-lab.com/) | [CARs source Code](https://github.com/vanderschaarlab/CARs) | [CARs Paper](https://arxiv.org/abs/2209.11222) | 2022|
+| ITErpretability | [van der Schaar Lab](https://www.vanderschaar-lab.com/) | [ITErpretability Source Code](https://github.com/vanderschaarlab/ITErpretability) | [ITErpretability Paper](https://arxiv.org/abs/2206.08363) | 2022|
+| Label-Free XAI | [van der Schaar Lab](https://www.vanderschaar-lab.com/) | [Label-Free XAI Source Code](https://github.com/vanderschaarlab/Label-Free-XAI) | [Label-Free XAI Paper](https://arxiv.org/abs/2203.01928) | 2022|
 | SimplEx | [van der Schaar Lab](https://www.vanderschaar-lab.com/)  | [SimplEx Source Code](https://github.com/vanderschaarlab/Simplex) | [SimplEx Paper](https://papers.nips.cc/paper/2021/hash/65658fde58ab3c2b6e5132a39fae7cb9-Abstract.html) | 2021 |
-| Dynamask | [van der Schaar Lab](https://www.vanderschaar-lab.com/) | [Dynamask Source Code](https://github.com/JonathanCrabbe/Dynamask) | [Dynamask Paper](https://arxiv.org/abs/2106.05303) | 2021 |
-| Symbolic Pursuit | [van der Schaar Lab](https://www.vanderschaar-lab.com/) | [Symbolic Pursuit Source Code](https://github.com/JonathanCrabbe/Symbolic-Pursuit) | [Symbolic Pursuit Paper](https://arxiv.org/abs/2011.08596#:~:text=Learning%20outside%20the%20Black%2DBox%3A%20The%20pursuit%20of%20interpretable%20models,-Jonathan%20Crabb%C3%A9%2C%20Yao&text=Machine%20Learning%20has%20proved%20its,difficulties%20of%20interpreting%20these%20models.) | 2020 |
+| Dynamask | [van der Schaar Lab](https://www.vanderschaar-lab.com/) | [Dynamask Source Code](https://github.com/vanderschaarlab/Dynamask) | [Dynamask Paper](https://arxiv.org/abs/2106.05303) | 2021 |
+| Symbolic Pursuit | [van der Schaar Lab](https://www.vanderschaar-lab.com/) | [Symbolic Pursuit Source Code](https://github.com/vanderschaarlab/Symbolic-Pursuit) | [Symbolic Pursuit Paper](https://arxiv.org/abs/2011.08596#:~:text=Learning%20outside%20the%20Black%2DBox%3A%20The%20pursuit%20of%20interpretable%20models,-Jonathan%20Crabb%C3%A9%2C%20Yao&text=Machine%20Learning%20has%20proved%20its,difficulties%20of%20interpreting%20these%20models.) | 2020 |
 | INVASE |  [van der Schaar Lab](https://www.vanderschaar-lab.com/)  | [INVASE Source Code](https://github.com/vanderschaarlab/INVASE) | [INVASE Paper](https://openreview.net/forum?id=BJg_roAcK7) | 2019 |
 | SHAP |  University of Washington | [SHAP Source Code](https://github.com/slundberg/shap) (pytorch implementation: [Captum GradientShap](https://captum.ai/api/gradient_shap.html))| [SHAP Paper](https://papers.nips.cc/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html) | 2017 |
 | Integrated gradients | Google | [Integrated Gradient Source Code](https://github.com/ankurtaly/Integrated-Gradients)  (pytorch implementation: [Captum Integrated Gradients](https://captum.ai/docs/extension/integrated_gradients))| [Integrated Gradient paper](https://arxiv.org/abs/1703.01365) | 2017 |
@@ -67,6 +69,7 @@ There are many different static tabular data explainers, giving many different o
 
 | Explainer | Inputs | Notes | 
 | ----------- | ----------- | ----------- | 
+| CARs | The latent representation of the concept examples from the predictive model. | It is worth noting that CARs appears in both this and the following section as it can be easily implemented for either tabular data or time series data. |
 | SimplEx | The latent representation of records from the predictive model. | It is worth noting that SimplEx appears in both this and the following section as it can be easily implemented for either tabular data or time series data. |
 | Symbolic Pursuit | The training data and corresponding model predictions. | This method has the benefit of producing a mathematical expression that approximates the predictive model. This seeks to discover “rules” and “laws” learned by the machine model. |
 | INVASE | The training data and corresponding model predictions, with which to train a selector network. | Currently, INVASE has only been implemented for tabular data, but it could be extended to include time series explanations with some further work, see Section 5 of the paper linked above, "Future Work". |
@@ -83,6 +86,7 @@ The following Explainers work with models for making predictions from time serie
 | Explainer | Inputs | Notes | 
 | ----------- | ----------- | ----------- | 
 | Dynamask | The predictive model and its gradients. | Dynamask calculates feature importance at every time steps for each feature. This is advantageous over other saliency methods, such as SHAP and Integrated Gradients were optimized for static data then later extended to time series. They are thus static, and hence the context, is forgotten when treating all the time steps as separate features. |
+| CARs | The latent representation of the concept examples from the predictive model. | It is worth noting that CARs appears in both this and the following section as it can be easily implemented for either tabular data or time series data. |
 | SimplEx | The latent representation of records from the predictive model. | It is worth noting that SimplEx appears in both this and the following section as it can be easily implemented for either tabular data or time series data. |
 | SHAP | The predictive model and training data from which to subsequently calculate Shapley values. | SHAP and Integrated Gradients can both be used for time series, however their efficacy in this setting has been criticized in [this paper](https://papers.nips.cc/paper/2020/hash/47a3893cc405396a5c30d91320572d6d-Abstract.html). |
 | Integrated gradients | The predictive model and its gradients. | SHAP and Integrated Gradients can both be used for time series, however their efficacy in this setting has been criticized in [this paper](https://papers.nips.cc/paper/2020/hash/47a3893cc405396a5c30d91320572d6d-Abstract.html). |
@@ -96,6 +100,14 @@ The following Explainers work with unsupervised clustering ML models, that is to
 | Explainer | Inputs |  
 | ----------- | ----------- |
 | Label-Free XAI | The predictive model. |
+
+## Individualized Treatment Effects
+
+The following Explainers work with Individualized Treatment Effects (otherwise known as Conditional Average Treatment Effects).
+
+| Explainer | Inputs |  
+| ----------- | ----------- |
+| ITErpretability | The predictive model. |
 
 
 # Feature-based and example-based Explainers
@@ -151,4 +163,14 @@ The following explainers provide example importances for a given prediction.
 | SimplEx | The latent representation of records from the predictive model. | SimplEx is the first method, to our knowledge, to calculate both feature importance and example importance. It calculates the importance of each feature in each of the examples in the explanation in order to reveal why the model sees the test record as similar to those in the explanation. |
 
 
+## Concept-based Explainers
+
+
+Concept-based explainers explain the predictive models output in terms of the concepts provided by the user. This has the huge advantage of giving an explanation that is comprised of concepts that the user can understand even though they are not the input features to the model. For example, if there was a classifier that distinguished between horses and zebras one could provide examples of the concept of stripes and see how important stripes are to the predicted values.
+
+The following explainers provide example importances for a given prediction.
+
+| Explainer | Inputs |
+| ----------- | ----------- | 
+| ITErpretability | The latent representation of labelled concept examples from the predictive model. |
 
