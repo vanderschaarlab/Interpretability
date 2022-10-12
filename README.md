@@ -13,7 +13,7 @@ This is critical because for a model's predictions to be trusted they must be un
 2. [Explainers By Model Type](#explainers-by-model-type)
     - [Tabular Data Model Explainers](#tabular-data-model-explainers)
     - [Time Series model Explainers](#time-series-model-explainers)
-    - [Clustering Model Explainers](#clustering-model-explainers)
+    - [Unsupervised Model Explainers](#unsupervised-model-explainers)
 3. [Generalized and Personalized Explainers](#generalized-and-personalized-explainers)
     - [Generalized Explainers](#generalized-explainers)
     - [Personalized Explainers](#personalized-explainers)
@@ -93,7 +93,7 @@ The following Explainers work with models for making predictions from time serie
 | LIME | The predictive model from which to calculate weights in a local linear model .  | Lime has been extended to work with time series data with libraries such as Lime-For-Time. |
 
 
-## Clustering Model Explainers
+## Unsupervised Model Explainers
 
 The following Explainers work with unsupervised clustering ML models, that is to say those without labelled data in the training set.
 
