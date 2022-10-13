@@ -14,6 +14,7 @@ This is critical because for a model's predictions to be trusted they must be un
     - [Tabular Data Model Explainers](#tabular-data-model-explainers)
     - [Time Series model Explainers](#time-series-model-explainers)
     - [Unsupervised Model Explainers](#unsupervised-model-explainers)
+    - [Individualized Treatment Effect Explainers](#individualized-treatment-effect-explainers)
 3. [Generalized and Personalized Explainers](#generalized-and-personalized-explainers)
     - [Generalized Explainers](#generalized-explainers)
     - [Personalized Explainers](#personalized-explainers)
@@ -101,7 +102,7 @@ The following Explainers work with unsupervised clustering ML models, that is to
 | ----------- | ----------- |
 | Label-Free XAI | The predictive model. |
 
-## Individualized Treatment Effects
+## Individualized Treatment Effect Explainers
 
 The following Explainers work with Individualized Treatment Effects (otherwise known as Conditional Average Treatment Effects).
 
@@ -139,6 +140,7 @@ The following explainers provide feature importances for a given prediction.
 | ----------- | ----------- | ----------- | 
 | SimplEx | The latent representation of records from the predictive model. | SimplEx is the first method, to our knowledge, to calculate both feature importance and example importance. It calculates the importance of each feature in each of the examples in the explanation in order to reveal why the model sees the test record as similar to those in the explanation. |
 | Dynamask | The predictive model and its gradients. | Dynamask calculates feature importance at every time steps for each feature, without treating time steps as independent features.|
+| ITErpretability |  The predictive model. | |
 | INVASE | The training data and corresponding model predictions, with which to train a selector network. |  |
 | Symbolic Pursuit | The training data and corresponding model predictions. | Symbolic Pursuit calculates feature interactions as well as feature importances. It has the benefit of producing a mathematical expression that approximates the predictive model. <TODO how is this useful> |
 | SHAP | The predictive model and training data from which to subsequently calculate Shapley values. |  SHAP calculates feature interactions as well as feature importances.  |
@@ -172,5 +174,5 @@ The following explainers provide example importances for a given prediction.
 
 | Explainer | Inputs |
 | ----------- | ----------- | 
-| ITErpretability | The latent representation of labelled concept examples from the predictive model. |
+| CARs | The latent representation of labelled concept examples from the predictive model. |
 
