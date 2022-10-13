@@ -15,9 +15,10 @@ This is critical because for a model's predictions to be trusted they must be un
     - [Time Series model Explainers](#time-series-model-explainers)
     - [Unsupervised Model Explainers](#unsupervised-model-explainers)
     - [Individualized Treatment Effect Explainers](#individualized-treatment-effect-explainers)
-3. [Generalized and Personalized Explainers](#generalized-and-personalized-explainers)
-    - [Generalized Explainers](#generalized-explainers)
-    - [Personalized Explainers](#personalized-explainers)
+3. [Generalized and Personalized Explainers](#feature-based-and-example-based-explainers)
+    - [Generalized Explainers](#feature-based-explainers)
+    - [Personalized Explainers](#example-based-explainers)
+    - [Concept-based Explainers](#concept-based-explainers)
 
 # Background
 
