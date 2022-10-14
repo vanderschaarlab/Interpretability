@@ -109,7 +109,7 @@ The following Explainers work with Individualized Treatment Effects (otherwise k
 
 | Explainer | Inputs |  
 | ----------- | ----------- |
-| ITErpretability | The predictive model. |
+| ITErpretability | The conditional average treatment effects (CATE) model. |
 
 
 # Feature-based and example-based Explainers
@@ -141,7 +141,7 @@ The following explainers provide feature importances for a given prediction.
 | ----------- | ----------- | ----------- | 
 | SimplEx | The latent representation of records from the predictive model. | SimplEx is the first method, to our knowledge, to calculate both feature importance and example importance. It calculates the importance of each feature in each of the examples in the explanation in order to reveal why the model sees the test record as similar to those in the explanation. |
 | Dynamask | The predictive model and its gradients. | Dynamask calculates feature importance at every time steps for each feature, without treating time steps as independent features.|
-| ITErpretability |  The predictive model. | |
+| ITErpretability |  The conditional average treatment effects (CATE) model. | |
 | INVASE | The training data and corresponding model predictions, with which to train a selector network. |  |
 | Symbolic Pursuit | The training data and corresponding model predictions. | Symbolic Pursuit calculates feature interactions as well as feature importances. It has the benefit of producing a mathematical expression that approximates the predictive model. <TODO how is this useful> |
 | SHAP | The predictive model and training data from which to subsequently calculate Shapley values. |  SHAP calculates feature interactions as well as feature importances.  |
