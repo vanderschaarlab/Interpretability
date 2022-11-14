@@ -34,6 +34,11 @@ This GitHub repository aims to act as a home for interpretability methods, where
 can be found for every application. All the linked van der Schaar Lab repositories on this page are pytorch compatible.
 Pytorch versions of the other methods are available on public libraries, such as [captum](https://captum.ai/).
 
+This [video](https://www.youtube.com/watch?v=R-27AiRK1r0) is a quick introduction to our Interpretability Suite.
+It discusses why ML interpretability is so important and shows the array of different methods developed by the van der Schaar Lab
+that are available on this GitHub page. 
+
+
 # Explainers
 
 Different model architectures can require different interpretability models, or "Explainers".
