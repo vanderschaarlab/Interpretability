@@ -8,8 +8,9 @@ This is critical because for a model's predictions to be trusted they must be un
 
 # Table of Contents
 0. [Background](#background)
+    - [Introductory video](#introductory-video)
 1. [Exaplainers](#explainers)
-    - [Selecting the Right Interpretability Method](#selecting-the-right-interpretability-method)
+    - [Selecting the Right Interpretability Method](#selecting-an-interpretability-method)
 2. [Explainers By Model Type](#explainers-by-model-type)
     - [Tabular Data Model Explainers](#tabular-data-model-explainers)
     - [Time Series model Explainers](#time-series-model-explainers)
@@ -34,9 +35,13 @@ This GitHub repository aims to act as a home for interpretability methods, where
 can be found for every application. All the linked van der Schaar Lab repositories on this page are pytorch compatible.
 Pytorch versions of the other methods are available on public libraries, such as [captum](https://captum.ai/).
 
+## Introductory video
+
 This [video](https://www.youtube.com/watch?v=R-27AiRK1r0) is a quick introduction to our Interpretability Suite.
 It discusses why ML interpretability is so important and shows the array of different methods developed by the van der Schaar Lab
 that are available on this GitHub page. 
+
+[![Introduction to the Interpretability Suite](images/Short_intro_video_thumbnail.png)](https://www.youtube.com/watch?v=R-27AiRK1r0)
 
 
 # Explainers
