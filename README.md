@@ -11,7 +11,7 @@ This is critical because for a model's predictions to be trusted they must be un
     - [Introductory video](#introductory-video)
 1. [Exaplainers](#explainers)
     - [Selecting an Interpretability Method](#selecting-an-interpretability-method)
-2. [Implementation and Notebooks] (#implentation-and-notebooks)
+2. [Implementation and Notebooks](#implementation-and-notebooks)
     - [SimplEx](#simplex)
     - [Dynamask](#dynamask)
     - [shap](#shap)
@@ -77,7 +77,8 @@ Figure 1 shows a flowchart to help with the process of selecting the method that
 
 # Implementation and Notebooks
 
-This repository includes a common python interface for the following interpretability methods: SimplEx, Dynamask, shap, and Symbolic Pursuit. The interface provides the same methods for each of the methods such that you can use the same python methods in your scripts to set up an explainer for each interpretability method. The methods that are: 
+This repository includes a common python interface for the following interpretability methods: SimplEx, Dynamask, shap, and Symbolic Pursuit. The interface provides the same methods for each of the methods such that you can use the same python methods in your scripts to set up an explainer for each interpretability method. The methods that are:
+
     -  init: Instantiate the class of explainer of your choice.
     -  fit: Performs and training for the explainer (This is not required for Shap explainers).
     -  explain: Provide the explanation of the data provided.
@@ -86,16 +87,16 @@ This repository includes a common python interface for the following interpretab
 There are also Notebooks in this GitHub repository to demonstrate how each create the explainer object. These explainers can be saved and uploaded into the Interpretability Suite user interface.
 
 ## SimplEx
-The notebook to demonstrate Simplex can be found [here](Notebooks/implement_simplex.ipynb).
+The notebook to demonstrate the Simplex explainer can be found [here](Notebooks/implement_simplex.ipynb).
 
 ## Dynamask
-The notebook to demonstrate Dynamask can be found [here](Notebooks/implement_dynamask.ipynb).
+The notebook to demonstrate the Dynamask explainer can be found [here](Notebooks/implement_dynamask.ipynb).
 
 ## Shap
-The notebook to demonstrate Shap can be found [here](Notebooks/implement_shap.ipynb).
+The notebook to demonstrate the Shap explainer can be found [here](Notebooks/implement_shap.ipynb).
 
 ## Symbolic Pursuit
-The notebook to demonstrate Symbolic Pursuit can be found [here](Notebooks/implement_symbolic_pursuit.ipynb).
+The notebook to demonstrate the Symbolic Pursuit explainer can be found [here](Notebooks/implement_symbolic_pursuit.ipynb).
 
 # Explainers By Model Type
 
