@@ -10,13 +10,18 @@ This is critical because for a model's predictions to be trusted they must be un
 0. [Background](#background)
     - [Introductory video](#introductory-video)
 1. [Exaplainers](#explainers)
-    - [Selecting the Right Interpretability Method](#selecting-an-interpretability-method)
-2. [Explainers By Model Type](#explainers-by-model-type)
+    - [Selecting an Interpretability Method](#selecting-an-interpretability-method)
+2. [Implementation and Notebooks] (#implentation-and-notebooks)
+    - [SimplEx](#simplex)
+    - [Dynamask](#dynamask)
+    - [shap](#shap)
+    - [Symbolic Pursuit](#symbolic-pursuit)
+3. [Explainers By Model Type](#explainers-by-model-type)
     - [Tabular Data Model Explainers](#tabular-data-model-explainers)
     - [Time Series model Explainers](#time-series-model-explainers)
     - [Unsupervised Model Explainers](#unsupervised-model-explainers)
     - [Individualized Treatment Effect Explainers](#individualized-treatment-effect-explainers)
-3. [Generalized and Personalized Explainers](#feature-based-and-example-based-explainers)
+4. [Generalized and Personalized Explainers](#feature-based-and-example-based-explainers)
     - [Generalized Explainers](#feature-based-explainers)
     - [Personalized Explainers](#example-based-explainers)
     - [Concept-based Explainers](#concept-based-explainers)
@@ -69,6 +74,28 @@ Figure 1 shows a flowchart to help with the process of selecting the method that
 ![method selection flow chart](images/Interpretability_method_flow_diagram.svg)
 *Figure 1: Interpretability Method selection flowchart.*
 
+
+# Implementation and Notebooks
+
+This repository includes a common python interface for the following interpretability methods: SimplEx, Dynamask, shap, and Symbolic Pursuit. The interface provides the same methods for each of the methods such that you can use the same python methods in your scripts to set up an explainer for each interpretability method. The methods that are: 
+    -  init: Instantiate the class of explainer of your choice.
+    -  fit: Performs and training for the explainer (This is not required for Shap explainers).
+    -  explain: Provide the explanation of the data provided.
+    -  summary_plot: Visualize the explanation.
+    
+There are also Notebooks in this GitHub repository to demonstrate how each create the explainer object. These explainers can be saved and uploaded into the Interpretability Suite user interface.
+
+## SimplEx
+The notebook to demonstrate Simplex can be found [here](Notebooks/implement_simplex.ipynb).
+
+## Dynamask
+The notebook to demonstrate Dynamask can be found [here](Notebooks/implement_dynamask.ipynb).
+
+## Shap
+The notebook to demonstrate Shap can be found [here](Notebooks/implement_shap.ipynb).
+
+## Symbolic Pursuit
+The notebook to demonstrate Symbolic Pursuit can be found [here](Notebooks/implement_symbolic_pursuit.ipynb).
 
 # Explainers By Model Type
 

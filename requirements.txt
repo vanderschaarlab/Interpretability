@@ -1,0 +1,26 @@
+beautifulsoup4==4.11.1
+dill==0.3.6
+dynamask==0.0.1
+# invase==0.0.3
+# lfxai==0.1.1
+matplotlib==3.5.3
+matplotlib-inline==0.1.6
+numpy==1.22.4
+pandas==1.3.5
+pydot==1.4.2
+PyScaffold==4.3.1
+scikit-learn==0.24.2
+scipy==1.8.1
+seaborn==0.11.2
+shap==0.41.0
+simplexai==0.0.2
+sktime==0.13.2
+symbolic-pursuit==0.0.1
+sympy==1.6.2
+tensorflow==2.10.0
+termcolor==2.0.1
+torch==1.12.1
+torchvision==0.13.1
+tqdm==4.64.1
+typing_extensions @ file:///tmp/abs_ben9emwtky/croots/recipe/typing_extensions_1659638822008/work
+xgboost==1.6.2
