@@ -57,8 +57,13 @@ MANIFEST
 # Notebooks for testing implementations
 */notebooks/
 notebooks/
-Notebooks/
-*/implement*.py
+
+Notebooks/*
+!Notebooks/implement_simplex.ipynb
+!Notebooks/implement_simplex_time_series.ipynb
+!Notebooks/implement_dynamask.ipynb
+!Notebooks/implement_shap.ipynb
+!Notebooks/implement_symbolic_pursuit.ipynb
 
 # Package files
 *.egg
@@ -80,6 +85,8 @@ images/
 !images/Short_intro_video_thumbnail.png
 !images/Interpretability_method_flow_diagram.svg
 images/archived_images/
+symbolic_pursuit_expression.png
+symbolic_pursuit_projections.png
 
 
 
@@ -102,7 +109,7 @@ resources/data_scalers
 resources/saved_explainers
 
 # models
-models/
+**/models/train_*.py
 models/resources
 models/resources/trained_models
 

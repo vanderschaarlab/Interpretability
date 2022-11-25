@@ -8,9 +8,12 @@ cwd = os.path.abspath(".")
 pkl.settings["recurse"] = True
 
 
-def save_explainer(explainer, save_path):
+def save_explainer(explainer, save_path, verbose=True):
     save_path = os.path.join(cwd, save_path)
+    if verbose:
+        print(f"Saving explainer to: {save_path}")
     with open(save_path, "wb") as f:
+
         pkl.dump(explainer, f)
 
 

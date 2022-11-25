@@ -15,6 +15,8 @@ import matplotlib.colors as mcolors
 import webbrowser
 from bs4 import BeautifulSoup
 
+# from sklearn import neural_network # TODO: Add compatibility for sklearn
+
 
 # Interpretability relative
 from .utils import data
@@ -90,7 +92,7 @@ class SimplexBase(Explainer):
         self.corpus_size = corpus_size
         self.DEVICE = device
         estimator = copy.deepcopy(estimator)
-        estimator = estimator.train()
+        estimator = estimator.train()  # This causes error for sklearn models
         self.estimator = estimator.to(self.DEVICE)
         self.estimator_type = estimator_type
         super().__init__()
@@ -233,7 +235,6 @@ class SimplexTabluarExplainer(SimplexBase):
                 exceptions.InvalidShapeForModelOutput(
                     self.estimator.forward(self.corpus_inputs).shape
                 )
-
         try:
             # Compute the corpus and test latent representations
             corpus_latents = (
@@ -244,7 +245,7 @@ class SimplexTabluarExplainer(SimplexBase):
         except:
             raise exceptions.ModelsLatentRepresentationsNotAccessible()
 
-        # Fit SimplEx
+        # Fit SimplEx with corpus
         self.explainer = simplex.Simplex(
             corpus_examples=self.corpus_inputs, corpus_latent_reps=corpus_latents
         )

@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader
-import sympy as smp # We use sympy to display mathematical expresssions
+import sympy as smp  # We use sympy to display mathematical expresssions
 from sympy.printing import latex
 from sklearn.metrics import (
     mean_squared_error,
@@ -31,6 +31,7 @@ for retry in range(2):
     try:
         # third party
         import symbolic_pursuit
+
         break
     except ImportError:
         depends = ["symbolic-pursuit"]
@@ -41,7 +42,8 @@ from symbolic_pursuit import models
 class SymbolicPursuitExplanation(Explanation):
     """
     The explanation object for symbolic pursuit
-    """    
+    """
+
     def __init__(
         self,
         expression,
@@ -52,7 +54,7 @@ class SymbolicPursuitExplanation(Explanation):
         Args:
             expression (_type_): _description_
             projections (_type_): _description_
-        """    
+        """
         self.expression = expression
         self.projections = projections
         super().__init__()
@@ -64,14 +66,9 @@ class SymbolicPursuitExplanation(Explanation):
 
 class SymbolicPursuitExplainer(Explainer):
     def __init__(
-        self,
-        model: Any,
-        X_explain: np.array,
-        feature_names: List = [],
-        *argv,
-        **kwargs
+        self, model: Any, X_explain: np.array, feature_names: List = [], *argv, **kwargs
     ) -> None:
-        """ 
+        """
         SymbolicPursuitExplainer
 
         This explainer can take a very long time to fit. If fitting time is an issue there are several
@@ -88,7 +85,7 @@ class SymbolicPursuitExplainer(Explainer):
             baselines (List): Defaults to list(load_h().keys()),
             task_type (str): Either the string "classification" or "regression". Defaults to "regression",
             patience (int) : A hard limit on the number of optimisation loops in fit(). Defaults to  10,
-        """        
+        """
         self.model = model
         self.X_explain = X_explain
         self.fit_quality = None
@@ -97,12 +94,11 @@ class SymbolicPursuitExplainer(Explainer):
         else:
             self.feature_names = None
 
-
         super().__init__()
 
         smp.init_printing()
         self.symbolic_model = models.SymbolicRegressor(*argv, **kwargs)
-    
+
     @staticmethod
     def name() -> str:
         return "symbolic_pursuit_explainer"
@@ -113,15 +109,15 @@ class SymbolicPursuitExplainer(Explainer):
 
     def fit(self):
         """
-            Fit the symbolic Regressor
-        """    
-        # try to fit with numpy array (which works for some models e.g. sklearn models)   
+        Fit the symbolic Regressor
+        """
+        # try to fit with numpy array (which works for some models e.g. sklearn models)
         for retry in range(2):
             try:
                 self.symbolic_model.fit(self.model, self.X_explain)
                 break
             # If that fails due to expecting a different type for X_explain try again with X_explain as a torch tensor
-            # This workks for pytorch models
+            # This works for pytorch models
             except TypeError:
                 self.X_explain = torch.Tensor(self.X_explain)
         self.has_been_fit = True
@@ -134,14 +130,18 @@ class SymbolicPursuitExplainer(Explainer):
 
             for retry in range(2):
                 try:
-                    self.fit_quality = mean_squared_error(self.y_test, self.symbolic_model.predict(self.X_test))
+                    self.fit_quality = mean_squared_error(
+                        self.y_test, self.symbolic_model.predict(self.X_test)
+                    )
                     break
                 except TypeError:
                     self.X_test = torch.Tensor(self.X_test)
                     self.y_test = torch.Tensor(self.y_test)
             for retry in range(2):
                 try:
-                    self.model_fit_quality = mean_squared_error(self.y_test, self.model(self.X_test))
+                    self.model_fit_quality = mean_squared_error(
+                        self.y_test, self.model(self.X_test)
+                    )
                     break
                 except TypeError:
                     self.X_test = torch.Tensor(self.X_test)
@@ -180,7 +180,10 @@ class SymbolicPursuitExplainer(Explainer):
             self.explanation.projections,
             viewer="file",
             filename=save_path_stem + "_projections.png",
-            dvioptions=["-D", "2400"],
+            dvioptions=[
+                "-D",
+                "10000",
+            ],  # TODO: Find optimum value (it's higher than 1200)
         )
         if show:
             expression_img = Image.open(save_path_stem + "_expression.png")
@@ -191,8 +194,8 @@ class SymbolicPursuitExplainer(Explainer):
             print(self.explanation.expression)
             self.symbolic_model.print_projections()
 
-
-    def symbolic_predict(self, predict_array : np.array,):
+    def symbolic_predict(
+        self,
+        predict_array: np.array,
+    ):
         return self.symbolic_model.predict(predict_array)
-
-   
