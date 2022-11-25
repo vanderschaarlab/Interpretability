@@ -30,7 +30,7 @@ from dynamask.utils import losses
 class DynamaskExplainer(Explainer):
     def __init__(
         self,
-        model,
+        model: Any,
         perturbation_method: str = "gaussian_blur",
         group: bool = False,
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
@@ -39,13 +39,10 @@ class DynamaskExplainer(Explainer):
         Initialises the mask.
 
         Args:
-            model (_type_): _description_
-            perturbation_method (str, optional): _description_. Defaults to "gaussian_blur".
-            group (bool, optional): _description_. Defaults to False.
-            device (str, optional): _description_. Defaults to "cuda" if torch.cuda.is_available() else "cpu".
-
-        Returns:
-            _type_: _description_
+            model (Any): The model to explain. Must be a trained pytorch model.
+            perturbation_method (str): The method to create and apply perturbation on inputs based on masks. Defaults to "gaussian_blur".
+            group (bool): Boolean value to select whether or not to use a MaskGroup. MaskGroups allow fitting several masks of different areas simultaneously. Defaults to False.
+            device (str,): The device to send torch.tensors. Defaults to "cuda" if torch.cuda.is_available() else "cpu".
         """
         self.DEVICE = device
         model = model.train()
@@ -81,19 +78,19 @@ class DynamaskExplainer(Explainer):
         explain_id: int,
         X: Optional[np.array] = None,
         loss_function: str = "mse",
-        target: np.array = None,
-        baseline: torch.tensor = None,
+        target: Optional[np.array] = None,
+        baseline: Optional[torch.tensor] = None,
         area_list: Union[np.array, List] = np.arange(0.001, 0.051, 0.001),
     ):
         """
         Trains the mask.
 
         Args:
-            X (np.array): The data to be explained.
-            loss_function (str, optional): The name of the loss function to use, e.g. "cross_entropy", "log_loss", "log_loss_target", or "mse" Defaults to "mse".. Defaults to "mse".
+            X (np.array, optional): The data to be explained.
+            loss_function (str): The name of the loss function to use, e.g. "cross_entropy", "log_loss", "log_loss_target", or "mse" Defaults to "mse".. Defaults to "mse".
             target (np.array, optional): The target for the data being explained. Defaults to None. If none provided targets are generated from the blackbox model.
             baseline (torch.tensor, optional): A baseline for the perturbation method. Only required for fade_reference. Defaults to None.
-            area_list (Union[np.array, List], optional): List of areas for the group mask. Defaults to np.arange(0.001, 0.051, 0.001).
+            area_list (Union[np.array, List]): List of areas for the group mask. Defaults to np.arange(0.001, 0.051, 0.001).
 
         Returns:
             None
@@ -163,7 +160,11 @@ class DynamaskExplainer(Explainer):
         self.has_been_fit = True
 
     def refit(self, explain_id: int):
-        """A Helper function to fit the model again with the same parameters but for a different data record."""
+        """A Helper function to fit the model again with the same parameters but for a different data record.
+
+        Args:
+            explain_id (int): The id of the record to get the explanation for by refitting
+        """
         print("Re-fitting dynamask")
         self.fit(explain_id)
 
@@ -175,20 +176,20 @@ class DynamaskExplainer(Explainer):
         sigma: float = 1.0,
         get_mask_from_group_method: str = "best",
         extremal_mask_threshold: float = 0.01,
-    ) -> pd.DataFrame:
+    ) -> FeatureExplanation:
         """
         Get the explanation from the trained mask.
 
         Args:
-            ids_time (Union[list, np.array], optional): _description_. Defaults to None.
-            ids_feature (Union[list, np.array], optional): _description_. Defaults to None.
-            smooth (bool, optional): _description_. Defaults to False.
-            sigma (float, optional): _description_. Defaults to 1.0.
-            get_mask_from_group_method (str, optional): _description_. Defaults to "best".
-            extremal_mask_threshold (float, optional): _description_. Defaults to 0.01.
+            ids_time (Union[list, np.array], optional): A list of time steps to focus to explanation on. Defaults to None leading to all time steps being included in the explanation.
+            ids_feature (Union[list, np.array], optional):  A list of features to focus to explanation on. Defaults to None leading to all features being included in the explanation.
+            smooth (bool, optional): A boolean value to state weather or not to smooth the mask (i.e. interpolate between extreme values to provide a smooth transition in the time dimention). Defaults to False.
+            sigma (float, optional): Width of the smoothing Gaussian kernel.. Defaults to 1.0.
+            get_mask_from_group_method (str, optional): Can take values of "best" or "extremal". "best" returns the mask with lowest error. "extremal" returns the extremal mask for the acceptable error threshold. Defaults to "best".
+            extremal_mask_threshold (float, optional): The acceptable error threshold for extremal masks. Defaults to 0.01.
 
         Returns:
-            pd.DataFrame: _description_
+            FeatureExplanation: A simple feature importance pd.dataframe where columns refer to the time steps and rows refer to the features.
         """
         if self.has_been_fit:
             if self.group:
@@ -223,16 +224,17 @@ class DynamaskExplainer(Explainer):
             raise exceptions.ExplainCalledBeforeFit(self.has_been_fit)
 
     def summary_plot(
-        self, explanation: List = None, show=True, save_path="temp_dynamask_plot.png"
-    ):
+        self,
+        explanation: List = None,
+        show: bool = True,
+        save_path: str = "temp_dynamask_plot.png",
+    ) -> None:
         """This method plots (part of) the mask.
 
         Args:
-            ids_time: List of the times that should appear on the plot.
-            ids_feature: List of the features that should appear on the plot.
-            smooth: True if the mask should be smoothed before plotting.
-            sigma: Width of the smoothing Gaussian kernel.
-
+            explanation (List, optional): The FeatureExplanation returned by .explain(). Defaults to None, in which case it is assumed the explanation is from the result of the previous explain() call.
+            show (bool, optional): Boolean value to decide if the plot is displayed. Defaults to True.
+            save_path (str, optional): The path with which to save the plot if show is set to false. Defaults to "temp_dynamask_plot.png".
         Returns:
             None
         """

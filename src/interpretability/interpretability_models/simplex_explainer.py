@@ -15,7 +15,7 @@ import matplotlib.colors as mcolors
 import webbrowser
 from bs4 import BeautifulSoup
 
-# from sklearn import neural_network # TODO: Add compatibility for sklearn
+# from pydantic import validate_arguments TODO: Add validation
 
 
 # Interpretability relative
@@ -88,11 +88,14 @@ class SimplexBase(Explainer):
         corpus_size: int = 100,
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
     ) -> None:
+        """
+        AbstractBase class for SimplEx explainers
+        The simplex explainer must implement fit(), explain() and summary_plot(), or it will fail.
+        """
         self.feature_names = feature_names
         self.corpus_size = corpus_size
         self.DEVICE = device
         estimator = copy.deepcopy(estimator)
-        estimator = estimator.train()  # This causes error for sklearn models
         self.estimator = estimator.to(self.DEVICE)
         self.estimator_type = estimator_type
         super().__init__()
@@ -136,7 +139,15 @@ class SimplexExplanation(Explanation):
         feature_importances: Union[pd.DataFrame, List],
         sort_order: np.array,
     ) -> None:
+        """SimplEx explanation object
 
+        Args:
+            test_record (Union[pd.DataFrame, List]): The record that is being explained
+            corpus_importances (List): The
+            corpus_breakdown (Union[pd.DataFrame, List]): _description_
+            feature_importances (Union[pd.DataFrame, List]): _description_
+            sort_order (np.array): _description_
+        """
         self.test_record = test_record
         self.corpus_importances = corpus_importances
         self.corpus_breakdown = corpus_breakdown
@@ -152,9 +163,6 @@ class SimplexExplanation(Explanation):
 class SimplexTabluarExplainer(SimplexBase):
     """
     A SimplEx interpretability model to explain tabluar data.
-
-        corpus_size: The number of examples used in the corpus
-        feature_names: The names of the features in the input data
     """
 
     def __init__(
@@ -173,7 +181,7 @@ class SimplexTabluarExplainer(SimplexBase):
         Initialises the explainer.
 
         Args:
-            estimator (Any): The model to explain. Must be trained. It must also have the method "latent_representation", which recieves the input data and returns their latent space representation. #TODO: Check, classify, and describe what models can be used. pytorch, simple python white boxes etc.
+            estimator (Any): The model to explain. Must be a trained pytorch model. It must also have the method "latent_representation", which recieves the input data and returns their latent space representation.
             corpus_X (pd.DataFrame): The set of records used to explain the test record(s). The individual cases for the case-based explanation.
             corpus_y (Union[pd.DataFrame, pd.Series]): The labels/targets for the corpus.
             feature_names (Optional[List], optional): The names of the feature of the dataset. If None is passed (which is the default), the feature_names will be taken from the column names of the corpus_X DataFrame.
@@ -210,30 +218,27 @@ class SimplexTabluarExplainer(SimplexBase):
 
         # Compute corpus model predictions
         if self.estimator_type == "classifier":
-            if self.estimator.forward(self.corpus_inputs).shape[1] == 1:
+            if self.estimator(self.corpus_inputs).shape[1] == 1:
                 self.corpus_predictions = (
-                    self.estimator.forward(self.corpus_inputs)
-                    .to(self.DEVICE)
-                    .detach()
-                    .round()
+                    self.estimator(self.corpus_inputs).to(self.DEVICE).detach().round()
                 )
-            elif self.estimator.forward(self.corpus_inputs).shape[1] > 1:
+            elif self.estimator(self.corpus_inputs).shape[1] > 1:
                 self.corpus_predictions = torch.argmax(
-                    self.estimator.forward(self.corpus_inputs).to(self.DEVICE).detach(),
+                    self.estimator(self.corpus_inputs).to(self.DEVICE).detach(),
                     dim=1,
                 )
             else:
                 exceptions.InvalidShapeForModelOutput(
-                    self.estimator.forward(self.corpus_inputs).shape
+                    self.estimator(self.corpus_inputs).shape
                 )
         else:
-            if self.estimator.forward(self.corpus_inputs).shape[1] == 1:
+            if self.estimator(self.corpus_inputs).shape[1] == 1:
                 self.corpus_predictions = (
-                    self.estimator.forward(self.corpus_inputs).to(self.DEVICE).detach()
+                    self.estimator(self.corpus_inputs).to(self.DEVICE).detach()
                 )
             else:
                 exceptions.InvalidShapeForModelOutput(
-                    self.estimator.forward(self.corpus_inputs).shape
+                    self.estimator(self.corpus_inputs).shape
                 )
         try:
             # Compute the corpus and test latent representations
@@ -408,8 +413,8 @@ class SimplexTabluarExplainer(SimplexBase):
         self,
         rescale_dict: Optional[
             dict
-        ] = None,  # TODO: rescales with scaler object.inverse_transform
-        example_importance_threshold=0.0,
+        ] = None,  # TODO: rescales with sklearn.scaler_object.inverse_transform?
+        example_importance_threshold: float = 0.0,
         output_file_prefix: str = "",
         open_in_browser: bool = True,
         return_type: str = "styled_df",
@@ -569,22 +574,18 @@ class SimplexTabluarExplainer(SimplexBase):
 
             test_table_div = soup.find_all("div", {"id": "corpus_table"})[0]
             test_table_div.append(corpus_table_soup)
-            with open(f"output/{output_file_prefix}SimplEx_tabular.html", "w") as f:
+            with open(f"{output_file_prefix}SimplEx_tabular.html", "w") as f:
                 f.write(str(soup))
             if open_in_browser:
                 filename = (
                     "file:///"
                     + os.getcwd()
                     + "/"
-                    + f"output/{output_file_prefix}SimplEx_tabular.html"
+                    + f"{output_file_prefix}SimplEx_tabular.html"
                 )
                 webbrowser.open_new_tab(filename)
         if return_type == "styled_df":
             return explain_record_df, display_corpus_df
-        elif return_type == "html":
-            return str(soup)
-        else:
-            return None
 
     @staticmethod
     def name() -> str:
@@ -847,11 +848,11 @@ class SimplexTimeSeriesExplainer(SimplexBase):
         self,
         rescale_dict: Optional[dict] = None,
         plot_test: bool = True,
-        example_importance_threshold=0.1,
-        time_steps_to_display=10,
+        example_importance_threshold: float = 0.1,
+        time_steps_to_display: int = 10,
         output_file_prefix: str = "",
         open_in_browser: bool = True,
-        return_type="styled_df",
+        return_type: str = "styled_df",
     ) -> Optional[tuple]:
         def highlight(x):
             return pd.DataFrame(
@@ -978,7 +979,7 @@ class SimplexTimeSeriesExplainer(SimplexBase):
                 new_p_tag.string = f"Test prediction: {self.explain_predictions[self.explain_id].item():0.0f} \xa0\xa0|\xa0\xa0 Test label: {self.explain_targets[self.explain_id]:0.0f}"
                 test_soup.html.body.div.insert(2, new_p_tag)
                 with open(
-                    f"output/{output_file_prefix}SimplEx_time_series_test_record.html",
+                    f"{output_file_prefix}SimplEx_time_series_test_record.html",
                     "w",
                 ) as f:
                     f.write(str(test_soup))
@@ -988,7 +989,7 @@ class SimplexTimeSeriesExplainer(SimplexBase):
                         "file:///"
                         + os.getcwd()
                         + "/"
-                        + f"output/{output_file_prefix}SimplEx_time_series_test_record.html"
+                        + f"{output_file_prefix}SimplEx_time_series_test_record.html"
                     )
                     webbrowser.open_new_tab(filename)
 
@@ -1172,7 +1173,7 @@ class SimplexTimeSeriesExplainer(SimplexBase):
                 new_tag.string = f"Example Importance: {100*corpus_data[example_i]['Example Importance']:0.2f}% \xa0\xa0|\xa0\xa0 Corpus Prediction: {corpus_data[example_i]['Prediction'].item():0.0f} \xa0\xa0|\xa0\xa0 Corpus Label: {corpus_data[example_i]['Label']:0.0f}"
                 soup.html.body.div.append(new_tag)
                 with open(
-                    f"output/{output_file_prefix}SimplEx_time_series_corpus_member_{example_i}.html",
+                    f"{output_file_prefix}SimplEx_time_series_corpus_member_{example_i}.html",
                     "w",
                 ) as f:
                     f.write(str(soup))
@@ -1181,14 +1182,9 @@ class SimplexTimeSeriesExplainer(SimplexBase):
                         "file:///"
                         + os.getcwd()
                         + "/"
-                        + f"output/{output_file_prefix}SimplEx_time_series_corpus_member_{example_i}.html"
+                        + f"{output_file_prefix}SimplEx_time_series_corpus_member_{example_i}.html"
                     )
                     webbrowser.open_new_tab(filename)
-
-        if return_type == "html":
-            return str(test_soup), str(soup)
-        else:
-            return None
 
     @staticmethod
     def name() -> str:

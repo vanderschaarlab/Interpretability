@@ -87,16 +87,16 @@ This repository includes a common python interface for the following interpretab
 There are also Notebooks in this GitHub repository to demonstrate how each create the explainer object. These explainers can be saved and uploaded into the Interpretability Suite user interface.
 
 ## SimplEx
-The notebook to demonstrate the Simplex explainer can be found [here](Notebooks/implement_simplex.ipynb).
+The SimplEx explainer is only compatible with pytorch models. These models must also implement the function latent_representation(). A base class (interpretability.models.base.BlackBox) that your Black-Box model can inherit from is provided, in this package, but this is not a requirement. The notebook to demonstrate the Simplex explainer can be found [here](Notebooks/implement_simplex.ipynb).
 
 ## Dynamask
-The notebook to demonstrate the Dynamask explainer can be found [here](Notebooks/implement_dynamask.ipynb).
+The Dynamask explainer is only compatible with pytorch models for time series data. The notebook to demonstrate the Dynamask explainer can be found [here](Notebooks/implement_dynamask.ipynb).
 
 ## Shap
-The notebook to demonstrate the Shap explainer can be found [here](Notebooks/implement_shap.ipynb).
+The Shap explainer is compatible with pytorch models such as multilayer perceptrons, tree-based models from libraries such as sci-kit learn or xgboost, Kernel models such as those from sci-kit learn, and linear models. The notebook to demonstrate the Shap explainer can be found [here](Notebooks/implement_shap.ipynb). It uses a ShapTreeExplainer to explain the predictions of an XGBoost classifier.
 
 ## Symbolic Pursuit
-The notebook to demonstrate the Symbolic Pursuit explainer can be found [here](Notebooks/implement_symbolic_pursuit.ipynb).
+The SimplEx explainer is only compatible with pytorch models and sci-kit learn linear and multilayer perceptron models. <TODO TODO check other models> The notebook to demonstrate the Symbolic Pursuit explainer can be found [here](Notebooks/implement_symbolic_pursuit.ipynb).
 
 # Explainers By Model Type
 
