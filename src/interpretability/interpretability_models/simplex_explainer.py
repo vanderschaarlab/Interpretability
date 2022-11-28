@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import webbrowser
 from bs4 import BeautifulSoup
+from sklearn import preprocessing
 
 # from pydantic import validate_arguments TODO: Add validation
 
@@ -411,9 +412,16 @@ class SimplexTabluarExplainer(SimplexBase):
 
     def summary_plot(
         self,
-        rescale_dict: Optional[
-            dict
-        ] = None,  # TODO: rescales with sklearn.scaler_object.inverse_transform?
+        rescaler: Union[
+            dict,
+            preprocessing.StandardScaler,
+            preprocessing.MinMaxScaler,
+            preprocessing.MaxAbsScaler,
+            preprocessing.RobustScaler,
+            preprocessing.QuantileTransformer,
+            preprocessing.PowerTransformer,
+            None,
+        ] = None,
         example_importance_threshold: float = 0.0,
         output_file_prefix: str = "",
         open_in_browser: bool = True,
@@ -425,33 +433,53 @@ class SimplexTabluarExplainer(SimplexBase):
                 importance_df_colors.values, index=x.index, columns=x.columns
             )
 
+        def rescale_data(data, rescaler):
+            available_sklearn_rescalers = (
+                preprocessing.StandardScaler,
+                preprocessing.MinMaxScaler,
+                preprocessing.MaxAbsScaler,
+                preprocessing.RobustScaler,
+                preprocessing.QuantileTransformer,
+                preprocessing.PowerTransformer,
+            )
+
+            if isinstance(rescaler, dict):
+                for col_name, rescale_value in rescaler.items():
+                    data[col_name] = data[col_name].apply(lambda x: x * rescale_value)
+            elif isinstance(rescaler, available_sklearn_rescalers):
+                data = pd.DataFrame(
+                    data=rescaler.inverse_transform(data), columns=self.feature_names
+                )
+            else:
+                raise TypeError(
+                    f"Unsupported type for rescaler object: {type(rescaler)}. Expected dictionary or one of the following sklearn.preprocessing objects: StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler, QuantileTransformer, or PowerTransformer."
+                )
+            return data
+
         output_file_prefix = (
             output_file_prefix + "_"
             if output_file_prefix and output_file_prefix[-1] != "_"
             else output_file_prefix
         )
+
         # Create test record df
         explain_record_df = self.explanation.test_record
         explain_record_df.index = ["Test Record"]
+        # rescale data if rescaler provided
+        if rescaler:
+            explain_record_df = rescale_data(explain_record_df, rescaler)
+        # Add columns for prediction and label
         explain_record_df["Test Prediction"] = self.explain_predictions[
             self.explain_id
         ].item()
         explain_record_df["Test Label"] = self.explain_targets[self.explain_id].item()
 
-        if rescale_dict:
-            for col_name, rescale_value in rescale_dict.items():
-                explain_record_df[col_name] = explain_record_df[col_name].apply(
-                    lambda x: x * rescale_value
-                )
-
         # Create corpus df
         corpus_df = self.explanation.corpus_breakdown
         corpus_df.index = [f"Corpus member {i}" for i in range(len(corpus_df))]
-        if rescale_dict:
-            for col_name, rescale_value in rescale_dict.items():
-                corpus_df[col_name] = corpus_df[col_name].apply(
-                    lambda x: x * rescale_value
-                )
+        if rescaler:
+            corpus_df = rescale_data(corpus_df, rescaler)
+
         corpus_df["Example Importance"] = self.explanation.corpus_importances
         corpus_df["Corpus Prediction"] = self.corpus_predictions.cpu()
         corpus_df["Corpus Label"] = self.corpus_targets.cpu()
@@ -846,7 +874,16 @@ class SimplexTimeSeriesExplainer(SimplexBase):
 
     def summary_plot(
         self,
-        rescale_dict: Optional[dict] = None,
+        rescaler: Union[
+            dict,
+            preprocessing.StandardScaler,
+            preprocessing.MinMaxScaler,
+            preprocessing.MaxAbsScaler,
+            preprocessing.RobustScaler,
+            preprocessing.QuantileTransformer,
+            preprocessing.PowerTransformer,
+            None,
+        ] = None,
         plot_test: bool = True,
         example_importance_threshold: float = 0.1,
         time_steps_to_display: int = 10,
@@ -858,6 +895,29 @@ class SimplexTimeSeriesExplainer(SimplexBase):
             return pd.DataFrame(
                 importance_df_colors.values, index=x.index, columns=x.columns
             )
+
+        def rescale_data(data, rescaler):
+            available_sklearn_rescalers = (
+                preprocessing.StandardScaler,
+                preprocessing.MinMaxScaler,
+                preprocessing.MaxAbsScaler,
+                preprocessing.RobustScaler,
+                preprocessing.QuantileTransformer,
+                preprocessing.PowerTransformer,
+            )
+
+            if isinstance(rescaler, dict):
+                for col_name, rescale_value in rescaler.items():
+                    data[col_name] = data[col_name].apply(lambda x: x * rescale_value)
+            elif isinstance(rescaler, available_sklearn_rescalers):
+                data = pd.DataFrame(
+                    data=rescaler.inverse_transform(data), columns=self.feature_names
+                )
+            else:
+                raise TypeError(
+                    f"Unsupported type for rescaler object: {type(rescaler)}. Expected dictionary or one of the following sklearn.preprocessing objects: StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler, QuantileTransformer, or PowerTransformer."
+                )
+            return data
 
         output_file_prefix = (
             output_file_prefix + "_"
@@ -897,11 +957,8 @@ class SimplexTimeSeriesExplainer(SimplexBase):
                     ],
                 )
             )
-            if rescale_dict:
-                for col_name, rescale_value in rescale_dict.items():
-                    test_record_df[col_name] = test_record_df[col_name].apply(
-                        lambda x: x * rescale_value
-                    )
+            if rescaler:
+                test_record_df = rescaler(test_record_df)
             try:
                 display(test_record_df)
             except:
@@ -1036,12 +1093,8 @@ class SimplexTimeSeriesExplainer(SimplexBase):
             )
         ]
 
-        if rescale_dict:
-            for corpus_df in corpus_dfs:
-                for col_name, rescale_value in rescale_dict.items():
-                    corpus_df[col_name] = corpus_df[col_name].apply(
-                        lambda x: x * rescale_value
-                    )
+        if rescaler:
+            test_record_df = rescaler(test_record_df)
 
         corpus_data = [
             {

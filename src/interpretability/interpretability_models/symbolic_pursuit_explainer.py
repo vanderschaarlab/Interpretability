@@ -182,7 +182,7 @@ class SymbolicPursuitExplainer(Explainer):
             filename=save_path_stem + "_projections.png",
             dvioptions=[
                 "-D",
-                "10000",
+                "2400",
             ],  # TODO: Find optimum value (it's higher than 1200)
         )
         if show:
