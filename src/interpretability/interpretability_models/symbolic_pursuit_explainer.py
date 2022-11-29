@@ -12,7 +12,6 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 import sympy as smp  # We use sympy to display mathematical expresssions
-from sympy.printing import latex
 from sklearn.metrics import (
     mean_squared_error,
 )  # we are going to assess the quality of the SymbolicRegressor based on the MSE
@@ -48,15 +47,22 @@ class SymbolicPursuitExplanation(Explanation):
         self,
         expression,
         projections,
+        model_fit_quality: Optional[float] = None,
+        fit_quality: Optional[float] = None,
     ) -> None:
         """Initialize the explanation object
 
         Args:
-            expression (_type_): _description_
-            projections (_type_): _description_
+            expression: The symbolic expression of the model.
+            projections: The projections in the symbolic expression.
+            model_fit_quality (Optional[float]): The MSE score for the predictive model based on a test dataset. Needs measure_fit_quality() to be run. Defaults to None.
+            fit_quality (Optional[float]): The MSE score for the symbolic model based on a test dataset. Needs measure_fit_quality() to be run. Defaults to None.
+
         """
         self.expression = expression
         self.projections = projections
+        self.model_fit_quality = model_fit_quality
+        self.fit_quality = fit_quality
         super().__init__()
 
     @staticmethod
@@ -72,7 +78,7 @@ class SymbolicPursuitExplainer(Explainer):
         SymbolicPursuitExplainer
 
         This explainer can take a very long time to fit. If fitting time is an issue there are several
-        options you can pass to reduce it, such as increaced `loss_tol` or reduced `patience`.
+        options you can pass to reduce it, such as increased `loss_tol` or reduced `patience`.
 
         Args:
             model (Any): The model to approximate.
@@ -88,6 +94,7 @@ class SymbolicPursuitExplainer(Explainer):
         """
         self.model = model
         self.X_explain = X_explain
+        self.model_fit_quality = None
         self.fit_quality = None
         if feature_names:
             self.feature_names = feature_names
@@ -159,7 +166,9 @@ class SymbolicPursuitExplainer(Explainer):
         if self.has_been_fit:
             expression = self.symbolic_model.get_expression()
             projections = self.symbolic_model.get_projections()
-            self.explanation = SymbolicPursuitExplanation(expression, projections)
+            self.explanation = SymbolicPursuitExplanation(
+                expression, projections, self.model_fit_quality, self.fit_quality
+            )
             return self.explanation
         else:
             raise exceptions.ExplainCalledBeforeFit(self.has_been_fit)
@@ -168,24 +177,24 @@ class SymbolicPursuitExplainer(Explainer):
         """
         Plot the latex'ed equations
         """
-        save_path_stem = os.path.abspath(save_folder)
-        save_path_stem = os.path.join(save_path_stem, file_prefilx)
-        smp.preview(
-            self.explanation.expression,
-            viewer="file",
-            filename=save_path_stem + "_expression.png",
-            dvioptions=["-D", "1200"],
-        )
-        smp.preview(
-            self.explanation.projections,
-            viewer="file",
-            filename=save_path_stem + "_projections.png",
-            dvioptions=[
-                "-D",
-                "2400",
-            ],  # TODO: Find optimum value (it's higher than 1200)
-        )
         if show:
+            save_path_stem = os.path.abspath(save_folder)
+            save_path_stem = os.path.join(save_path_stem, file_prefilx)
+            smp.preview(
+                self.explanation.expression,
+                viewer="file",
+                filename=save_path_stem + "_expression.png",
+                dvioptions=["-D", "1200"],
+            )
+            smp.preview(
+                self.explanation.projections,
+                viewer="file",
+                filename=save_path_stem + "_projections.png",
+                dvioptions=[
+                    "-D",
+                    "2400",
+                ],  # TODO: Find optimum value (it's higher than 1200)
+            )
             expression_img = Image.open(save_path_stem + "_expression.png")
             projection_img = Image.open(save_path_stem + "_projections.png")
             expression_img.show()
