@@ -22,7 +22,16 @@ from interpretability.utils.pip import install
 from interpretability.exceptions import exceptions
 
 # dynamask
-import dynamask
+for retry in range(2):
+    try:
+        # third party
+        import dynamask
+
+        break
+    except ImportError:
+        depends = ["dynamask"]
+        install(depends)
+
 from dynamask.attribution import mask, mask_group, perturbation
 from dynamask.utils import losses
 
