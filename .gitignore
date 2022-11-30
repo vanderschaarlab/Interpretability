@@ -57,13 +57,12 @@ MANIFEST
 # Notebooks for testing implementations
 */notebooks/
 notebooks/
-
 Notebooks/*
-!Notebooks/implement_simplex.ipynb
-!Notebooks/implement_simplex_time_series.ipynb
-!Notebooks/implement_dynamask.ipynb
-!Notebooks/implement_shap.ipynb
-!Notebooks/implement_symbolic_pursuit.ipynb
+!Notebooks/Tutorial_01_implement_simplex.ipynb
+!Notebooks/Tutorial_02_implement_simplex_time_series.ipynb
+!Notebooks/Tutorial_03_implement_dynamask.ipynb
+!Notebooks/Tutorial_04_implement_shap.ipynb
+!Notebooks/Tutorial_05_implement_symbolic_pursuit.ipynb
 
 # Package files
 *.egg
@@ -81,9 +80,10 @@ coverage.xml
 .pytest_cache/
 
 # images
-images/
+images/*
 !images/Short_intro_video_thumbnail.png
 !images/Interpretability_method_flow_diagram.svg
+!images/interpretability_suite_image.png
 images/archived_images/
 symbolic_pursuit_expression.png
 symbolic_pursuit_projections.png

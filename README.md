@@ -9,19 +9,20 @@ This is critical because for a model's predictions to be trusted they must be un
 # Table of Contents
 0. [Background](#background)
     - [Introductory video](#introductory-video)
-1. [Exaplainers](#explainers)
+1. [Interface](#Interface)
+2. [Explainers](#explainers)
     - [Selecting an Interpretability Method](#selecting-an-interpretability-method)
-2. [Implementation and Notebooks](#implementation-and-notebooks)
+3. [Implementation and Notebooks](#implementation-and-notebooks)
     - [SimplEx](#simplex)
     - [Dynamask](#dynamask)
     - [shap](#shap)
     - [Symbolic Pursuit](#symbolic-pursuit)
-3. [Explainers By Model Type](#explainers-by-model-type)
+4. [Explainers By Model Type](#explainers-by-model-type)
     - [Tabular Data Model Explainers](#tabular-data-model-explainers)
     - [Time Series model Explainers](#time-series-model-explainers)
     - [Unsupervised Model Explainers](#unsupervised-model-explainers)
     - [Individualized Treatment Effect Explainers](#individualized-treatment-effect-explainers)
-4. [Generalized and Personalized Explainers](#feature-based-and-example-based-explainers)
+5. [Generalized and Personalized Explainers](#feature-based-and-example-based-explainers)
     - [Generalized Explainers](#feature-based-explainers)
     - [Personalized Explainers](#example-based-explainers)
     - [Concept-based Explainers](#concept-based-explainers)
@@ -48,11 +49,17 @@ that are available on this GitHub page.
 
 [![Introduction to the Interpretability Suite](images/Short_intro_video_thumbnail.png)](https://www.youtube.com/watch?v=R-27AiRK1r0)
 
+# Interface
+The Interpretability Suite provides a common python interface for the following interpretability methods: SimplEx, Dynamask, shap, and Symbolic Pursuit. Each of these methods are also included in our [user interface](https://vanderschaarlab-demo-interpretabi-interpretability-suite-1uteyn.streamlit.app/). 
+
+[![The interpretability Suite](images/interpretability_suite_image.png)](https://vanderschaarlab-demo-interpretabi-interpretability-suite-1uteyn.streamlit.app/)
+
+This user interface not only demonstrates the methods and how they are used on example datasets, but it also gives the user the ability to upload their own explainer to visualize the results. This means that you can save your explainer and give the file to a less python-literate colleague and they can see the results for themselves simply by drag-and-dropping it into the `Upload your own Explainer` tab. 
 
 # Explainers
 
 Different model architectures can require different interpretability models, or "Explainers".
-Below are all the explainers included in this repository, with links to their source code and the papers that introduced them.
+Below are all the explainers included in this repository, with links to their source code and the papers that introduced them. SimplEx, Dynamask, shap, and Symbolic Pursuit have a common python interface implemented for them for ease of implementation (see [Interface](#interface) above and [Implementation and Notebooks](#implementation-andnotebooks) below). But any of the other methods can also be implemented by using the code in the GitHub column of the table below.
 
 | Explainer | Affiliation | GitHub | Paper | Date of Paper |
 | ----------- | ----------- | ----------- | ----------- | ----------- |
