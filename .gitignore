@@ -84,6 +84,7 @@ images/*
 !images/Short_intro_video_thumbnail.png
 !images/Interpretability_method_flow_diagram.svg
 !images/interpretability_suite_image.png
+!images/user_inter_face_upload.png
 images/archived_images/
 symbolic_pursuit_expression.png
 symbolic_pursuit_projections.png
@@ -104,12 +105,11 @@ data/
 raw.githubusercontent.com/
 
 # resources
-resources/
-resources/data_scalers
-resources/saved_explainers
+resources/*
+!resources/saved_models
+resources/saved_models/*
+
 
 # models
 **/models/train_*.py
-models/resources
-models/resources/trained_models
-
+src/interpretability/models/resources/

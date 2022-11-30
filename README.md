@@ -53,8 +53,12 @@ that are available on this GitHub page.
 The Interpretability Suite provides a common python interface for the following interpretability methods: SimplEx, Dynamask, shap, and Symbolic Pursuit. Each of these methods are also included in our [user interface](https://vanderschaarlab-demo-interpretabi-interpretability-suite-1uteyn.streamlit.app/). 
 
 [![The interpretability Suite](images/interpretability_suite_image.png)](https://vanderschaarlab-demo-interpretabi-interpretability-suite-1uteyn.streamlit.app/)
+*Figure 1: The Interpretability Suite User Interface Landing page*
 
 This user interface not only demonstrates the methods and how they are used on example datasets, but it also gives the user the ability to upload their own explainer to visualize the results. This means that you can save your explainer and give the file to a less python-literate colleague and they can see the results for themselves simply by drag-and-dropping it into the `Upload your own Explainer` tab. 
+
+![Upload your own Explainer tab](images/user_inter_face_upload.png)
+*Figure 2: An example of the `Upload your own Explainer` tab on the user interface from the SimplEx page*
 
 # Explainers
 
@@ -76,10 +80,10 @@ Below are all the explainers included in this repository, with links to their so
 
 ## Selecting an Interpretability Method
 
-Figure 1 shows a flowchart to help with the process of selecting the method that is most appropriate for your project.
+Figure 3 shows a flowchart to help with the process of selecting the method that is most appropriate for your project.
 
 ![method selection flow chart](images/Interpretability_method_flow_diagram.svg)
-*Figure 1: Interpretability Method selection flowchart.*
+*Figure 3: Interpretability Method selection flowchart.*
 
 
 # Implementation and Notebooks
