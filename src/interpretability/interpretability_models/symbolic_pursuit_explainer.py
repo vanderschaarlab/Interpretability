@@ -14,6 +14,7 @@ from torch.utils.data import DataLoader
 import sympy as smp  # We use sympy to display mathematical expresssions
 from sklearn.metrics import (
     mean_squared_error,
+    accuracy_score,
 )  # we are going to assess the quality of the SymbolicRegressor based on the MSE
 from PIL import Image
 
@@ -47,20 +48,29 @@ class SymbolicPursuitExplanation(Explanation):
         self,
         expression,
         projections,
+        x0: np.array,
+        feature_importance: List,
+        taylor_expansion: smp.core.add.Add,
         model_fit_quality: Optional[float] = None,
         fit_quality: Optional[float] = None,
     ) -> None:
         """Initialize the explanation object
 
         Args:
-            expression: The symbolic expression of the model.
-            projections: The projections in the symbolic expression.
+            expression (smp.core.add.Add): The symbolic expression of the model.
+            projections (List): The projections in the symbolic expression.
+            x0 (np.array):
+            feature_importance (smp.core.add.Add): The feature importance produced by SymbolicPursuitExplainer.symbolic_model.get_feature_importance(x0).
+            taylor_expansion (List): The taylor expansion produced by SymbolicPursuitExplainer.symbolic_model.get_taylor(x0, order).
             model_fit_quality (Optional[float]): The MSE score for the predictive model based on a test dataset. Needs measure_fit_quality() to be run. Defaults to None.
             fit_quality (Optional[float]): The MSE score for the symbolic model based on a test dataset. Needs measure_fit_quality() to be run. Defaults to None.
 
         """
         self.expression = expression
         self.projections = projections
+        self.x0 = x0
+        self.feature_importance = feature_importance
+        self.taylor_expansion = taylor_expansion
         self.model_fit_quality = model_fit_quality
         self.fit_quality = fit_quality
         super().__init__()
@@ -129,45 +139,79 @@ class SymbolicPursuitExplainer(Explainer):
                 self.X_explain = torch.Tensor(self.X_explain)
         self.has_been_fit = True
 
-    def measure_fit_quality(self, X_test, y_test):
+    def measure_fit_quality(self, X_test: np.array, y_test: np.array):
 
         if self.has_been_fit:
             self.X_test = X_test
             self.y_test = y_test
+            if self.symbolic_model.task_type == "classification":
+                for retry in range(2):
+                    try:
+                        self.fit_quality = accuracy_score(
+                            self.y_test, self.symbolic_model.predict(self.X_test)
+                        )
+                        break
+                    except TypeError:
+                        self.X_test = torch.Tensor(self.X_test)
+                        self.y_test = torch.Tensor(self.y_test)
+                for retry in range(2):
+                    try:
+                        self.model_fit_quality = accuracy_score(
+                            self.y_test, self.model(self.X_test)
+                        )
+                        break
+                    except TypeError:
+                        self.X_test = torch.Tensor(self.X_test)
+                        self.y_test = torch.Tensor(self.y_test)
 
-            for retry in range(2):
-                try:
-                    self.fit_quality = mean_squared_error(
-                        self.y_test, self.symbolic_model.predict(self.X_test)
-                    )
-                    break
-                except TypeError:
-                    self.X_test = torch.Tensor(self.X_test)
-                    self.y_test = torch.Tensor(self.y_test)
-            for retry in range(2):
-                try:
-                    self.model_fit_quality = mean_squared_error(
-                        self.y_test, self.model(self.X_test)
-                    )
-                    break
-                except TypeError:
-                    self.X_test = torch.Tensor(self.X_test)
-                    self.y_test = torch.Tensor(self.y_test)
+                print(f"MSE score for the model: {self.model_fit_quality}")
+                print(f"MSE score for the Symbolic Regressor: {self.fit_quality}")
+            elif self.symbolic_model.task_type == "regression":
+                for retry in range(2):
+                    try:
+                        self.fit_quality = mean_squared_error(
+                            self.y_test, self.symbolic_model.predict(self.X_test)
+                        )
+                        break
+                    except TypeError:
+                        self.X_test = torch.Tensor(self.X_test)
+                        self.y_test = torch.Tensor(self.y_test)
+                for retry in range(2):
+                    try:
+                        self.model_fit_quality = mean_squared_error(
+                            self.y_test, self.model(self.X_test)
+                        )
+                        break
+                    except TypeError:
+                        self.X_test = torch.Tensor(self.X_test)
+                        self.y_test = torch.Tensor(self.y_test)
 
-            print(f"MSE score for the model: {self.model_fit_quality}")
-            print(f"MSE score for the Symbolic Regressor: {self.fit_quality}")
+                print(f"MSE score for the model: {self.model_fit_quality}")
+                print(f"MSE score for the Symbolic Regressor: {self.fit_quality}")
         else:
             raise exceptions.MeasureFitQualityCalledBeforeFit(self.has_been_fit)
 
-    def explain(self, *argv, **kwargs) -> pd.DataFrame:
+    def explain(
+        self, x0: np.array = None, taylor_expansion_order: int = 2
+    ) -> pd.DataFrame:
         """
         The function to get the explanation data from the explainer
         """
         if self.has_been_fit:
             expression = self.symbolic_model.get_expression()
             projections = self.symbolic_model.get_projections()
+            feature_importance = self.symbolic_model.get_feature_importance(x0)
+            taylor_expansion = self.symbolic_model.get_taylor(
+                x0, taylor_expansion_order
+            )
             self.explanation = SymbolicPursuitExplanation(
-                expression, projections, self.model_fit_quality, self.fit_quality
+                expression,
+                projections,
+                x0,
+                feature_importance,
+                taylor_expansion,
+                self.model_fit_quality,
+                self.fit_quality,
             )
             return self.explanation
         else:
@@ -175,30 +219,34 @@ class SymbolicPursuitExplainer(Explainer):
 
     def summary_plot(self, file_prefilx="symbolic_pursuit", show=True, save_folder="."):
         """
-        Plot the latex'ed equations
+        Plot the latex'ed equations if latex installed
         """
         if show:
-            save_path_stem = os.path.abspath(save_folder)
-            save_path_stem = os.path.join(save_path_stem, file_prefilx)
-            smp.preview(
-                self.explanation.expression,
-                viewer="file",
-                filename=save_path_stem + "_expression.png",
-                dvioptions=["-D", "1200"],
-            )
-            smp.preview(
-                self.explanation.projections,
-                viewer="file",
-                filename=save_path_stem + "_projections.png",
-                dvioptions=[
-                    "-D",
-                    "2400",
-                ],  # TODO: Find optimum value (it's higher than 1200)
-            )
-            expression_img = Image.open(save_path_stem + "_expression.png")
-            projection_img = Image.open(save_path_stem + "_projections.png")
-            expression_img.show()
-            projection_img.show()
+            try:
+                save_path_stem = os.path.abspath(save_folder)
+                save_path_stem = os.path.join(save_path_stem, file_prefilx)
+                smp.preview(
+                    self.explanation.expression,
+                    viewer="file",
+                    filename=save_path_stem + "_expression.png",
+                    dvioptions=["-D", "1200"],
+                )
+                smp.preview(
+                    self.explanation.projections,
+                    viewer="file",
+                    filename=save_path_stem + "_projections.png",
+                    dvioptions=[
+                        "-D",
+                        "1200",
+                    ],  # TODO: Find optimum value
+                )
+                expression_img = Image.open(save_path_stem + "_expression.png")
+                projection_img = Image.open(save_path_stem + "_projections.png")
+                expression_img.show()
+                projection_img.show()
+            except RuntimeError as e:
+                print("For an output that does not require latex set `show=False`.")
+                raise e
         else:
             print(self.explanation.expression)
             self.symbolic_model.print_projections()
