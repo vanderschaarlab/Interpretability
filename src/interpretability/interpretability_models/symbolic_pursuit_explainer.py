@@ -5,6 +5,7 @@ import copy
 from typing import Any, List, Tuple, Optional, Union
 from abc import abstractmethod
 import inspect
+import itertools
 
 # third party
 import numpy as np
@@ -17,6 +18,8 @@ from sklearn.metrics import (
     accuracy_score,
 )  # we are going to assess the quality of the SymbolicRegressor based on the MSE
 from PIL import Image
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Interpretability relative
 from .utils import data
@@ -59,7 +62,7 @@ class SymbolicPursuitExplanation(Explanation):
         Args:
             expression (smp.core.add.Add): The symbolic expression of the model.
             projections (List): The projections in the symbolic expression.
-            x0 (np.array):
+            x0 (np.array): The record to evaluate the feature importance and feature interaction for.
             feature_importance (smp.core.add.Add): The feature importance produced by SymbolicPursuitExplainer.symbolic_model.get_feature_importance(x0).
             taylor_expansion (List): The taylor expansion produced by SymbolicPursuitExplainer.symbolic_model.get_taylor(x0, order).
             model_fit_quality (Optional[float]): The MSE score for the predictive model based on a test dataset. Needs measure_fit_quality() to be run. Defaults to None.
@@ -74,6 +77,7 @@ class SymbolicPursuitExplanation(Explanation):
         self.model_fit_quality = model_fit_quality
         self.fit_quality = fit_quality
         super().__init__()
+        print(smp.latex(smp.expand(taylor_expansion)))
 
     @staticmethod
     def name() -> str:
@@ -109,7 +113,7 @@ class SymbolicPursuitExplainer(Explainer):
         if feature_names:
             self.feature_names = feature_names
         else:
-            self.feature_names = None
+            self.feature_names = list(range(X_explain.shape[1]))
 
         super().__init__()
 
@@ -164,8 +168,8 @@ class SymbolicPursuitExplainer(Explainer):
                         self.X_test = torch.Tensor(self.X_test)
                         self.y_test = torch.Tensor(self.y_test)
 
-                print(f"MSE score for the model: {self.model_fit_quality}")
-                print(f"MSE score for the Symbolic Regressor: {self.fit_quality}")
+                print(f"Accuracy score for the model: {self.model_fit_quality}")
+                print(f"Accuracy score for the Symbolic Regressor: {self.fit_quality}")
             elif self.symbolic_model.task_type == "regression":
                 for retry in range(2):
                     try:
@@ -217,11 +221,46 @@ class SymbolicPursuitExplainer(Explainer):
         else:
             raise exceptions.ExplainCalledBeforeFit(self.has_been_fit)
 
-    def summary_plot(self, file_prefilx="symbolic_pursuit", show=True, save_folder="."):
+    def summary_plot(
+        self,
+        file_prefilx="symbolic_pursuit",
+        show_expression=True,
+        show_feature_importance=True,
+        show_feature_interactions=True,
+        save_folder=".",
+    ):
         """
         Plot the latex'ed equations if latex installed
         """
-        if show:
+
+        def create_coefficient_heatmap_from_second_order_taylor_expansion(
+            expression,
+        ):
+            expression = smp.Poly(expression)
+            symbols = list(expression.free_symbols)
+            symbol_pairs = itertools.product(symbols, repeat=2)
+            coeffs_dict = {}
+            for s_p in symbol_pairs:
+                coeffs_dict[f"{s_p[0]}{s_p[1]}"] = expression.coeff_monomial(
+                    s_p[0] * s_p[1]
+                )
+            coeffs_dict = dict(sorted(coeffs_dict.items()))
+            coeffs_dict_reoriented = {}
+            for i in range(len(self.feature_names)):
+                coeffs_dict_reoriented[f"{self.feature_names[i]}"] = [
+                    float(coeffs_dict[f"X{i}X{j}"])
+                    for j in range(len(self.feature_names))
+                ]
+            coeffs = pd.DataFrame(data=coeffs_dict_reoriented, index=self.feature_names)
+            mask = np.triu(coeffs)
+            # np.fill_diagonal(mask, 0)
+            figure = sns.heatmap(
+                coeffs, annot=True, mask=mask, fmt=".2f", annot_kws={"fontsize": 4}
+            ).get_figure()
+            return figure
+
+        if show_expression:
+            """Show image of latex'ed expression if possible else print expression to console. Print projections to console."""
             try:
                 save_path_stem = os.path.abspath(save_folder)
                 save_path_stem = os.path.join(save_path_stem, file_prefilx)
@@ -231,25 +270,45 @@ class SymbolicPursuitExplainer(Explainer):
                     filename=save_path_stem + "_expression.png",
                     dvioptions=["-D", "1200"],
                 )
-                smp.preview(
-                    self.explanation.projections,
-                    viewer="file",
-                    filename=save_path_stem + "_projections.png",
-                    dvioptions=[
-                        "-D",
-                        "1200",
-                    ],  # TODO: Find optimum value
-                )
                 expression_img = Image.open(save_path_stem + "_expression.png")
-                projection_img = Image.open(save_path_stem + "_projections.png")
                 expression_img.show()
-                projection_img.show()
             except RuntimeError as e:
-                print("For an output that does not require latex set `show=False`.")
+                print(
+                    "For an output that does not require latex set `show_expression=False`."
+                )
                 raise e
         else:
             print(self.explanation.expression)
-            self.symbolic_model.print_projections()
+        self.symbolic_model.print_projections()
+
+        if show_feature_importance:
+            """Print a dataframe of feature importance (display if in Notebook)"""
+            feature_importance = self.symbolic_model.get_feature_importance(
+                self.explanation.x0
+            )
+            feature_importance_zip = zip(self.feature_names, feature_importance)
+            feature_importance_dict = {
+                k: [round(v, 2)] for k, v in feature_importance_zip
+            }
+            feature_importance_df = pd.DataFrame(data=feature_importance_dict)
+            try:
+                display(feature_importance_df)
+            except:
+                print(feature_importance_df)
+
+        if show_feature_interactions:
+            """Show a heatmap of the feature interactions"""
+            taylor_expansion = self.symbolic_model.get_taylor(self.explanation.x0, 2)
+            if taylor_expansion == 0:
+                print(
+                    "The taylor expansion that calculates feature interactions is not available. Try fitting the SymbolicPursuitExplainer for more iterations, by increasing `patience` or reducing `loss_tol`."
+                )
+            else:
+                taylor_expand_expr = smp.expand(taylor_expansion)
+                heatmap = create_coefficient_heatmap_from_second_order_taylor_expansion(
+                    taylor_expand_expr
+                )
+                plt.show()
 
     def symbolic_predict(
         self,
