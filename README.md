@@ -51,9 +51,7 @@ that are available on this GitHub page.
 
 # Interface
 
-The interface is in final stages of development and will be released soon. This section of the README reflects what it will be like on release.
-
-The Interpretability Suite provides a common python interface for the following interpretability methods: SimplEx, Dynamask, shap, and Symbolic Pursuit. Each of these methods are also included in our user interface. 
+The Interpretability Suite provides a common python interface for the following interpretability methods: SimplEx, Dynamask, shap, and Symbolic Pursuit. Each of these methods are also included in our user interface. To guarantee compatibility with the app please create your explainers using the interpretability_suite_app branch.
 
 ![The interpretability Suite](images/interpretability_suite_image.png)
 *Figure 1: The Interpretability Suite User Interface Landing page*
