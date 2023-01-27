@@ -69,13 +69,7 @@ class ArrowHeadGRU(BlackBox):
 
 class ConvNet(BlackBox):
     def __init__(
-        self,
-        input_dim=1,
-        hidden_dim=64,
-        kernel_size=3,
-        output_dim=1,
-        drop_prob=0.2,
-        activation_func="sigmoid",
+        self, input_dim=1, hidden_dim=64, kernel_size=3, output_dim=1, drop_prob=0.2
     ):
         super().__init__()
         self.hidden_dim = hidden_dim
@@ -95,18 +89,54 @@ class ConvNet(BlackBox):
         self.flatten = nn.Flatten()
         self.fc1 = nn.Linear(hidden_dim**2, output_dim)
         # self.fc2 = nn.Linear(hidden_dim, output_dim)
-        if activation_func == "sigmoid":
-            self.activation_func = nn.Sigmoid()
-        elif activation_func == "softmax":
-            self.activation_func = nn.Softmax(dim=-1)
-        elif not activation_func:
-            self.activation_func = None
+        self.sigmoid = nn.Sigmoid()
+        # self.Softmax = nn.Softmax(dim=-1)
 
     def forward(self, x):
         x = self.latent_representation(x)
         x = self.fc1(x)
-        if self.activation_func:
-            x = self.activation_func(x)
+        x = self.sigmoid(x)
+        return x
+
+    def latent_representation(self, x: torch.Tensor) -> torch.Tensor:
+        x = torch.transpose(x, 1, 2)
+        x = self.relu(self.bn1(self.convInput(x)))
+        x = self.relu(self.bn2(self.convHidden1(x)))
+        x = self.relu(self.bn3(self.convHidden2(x)))
+        x = self.flatten(self.pool(x))
+        return x
+
+
+class ConvNet_bm(BlackBox):
+    def __init__(
+        self,
+        input_dim=1,
+        hidden_dim=64,
+        kernel_size=3,
+        output_dim=1,
+        drop_prob=0.2,
+    ):
+        super().__init__()
+        self.hidden_dim = hidden_dim
+
+        self.convInput = nn.Conv1d(input_dim, hidden_dim, kernel_size, padding="same")
+        self.convHidden1 = nn.Conv1d(
+            hidden_dim, hidden_dim, kernel_size, padding="same"
+        )
+        self.convHidden2 = nn.Conv1d(
+            hidden_dim, hidden_dim, kernel_size, padding="same"
+        )
+        self.bn1 = nn.BatchNorm1d(hidden_dim)
+        self.bn2 = nn.BatchNorm1d(hidden_dim)
+        self.bn3 = nn.BatchNorm1d(hidden_dim)
+        self.relu = nn.ReLU()
+        self.pool = nn.AdaptiveMaxPool1d(hidden_dim)
+        self.flatten = nn.Flatten()
+        self.fc1 = nn.Linear(hidden_dim**2, output_dim)
+
+    def forward(self, x):
+        x = self.latent_representation(x)
+        x = self.fc1(x)
         return x
 
     def latent_representation(self, x: torch.Tensor) -> torch.Tensor:
